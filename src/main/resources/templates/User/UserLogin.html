@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <link href="../ladmin/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="../ladmin/css/login.css" rel="stylesheet" type="text/css">
+    <link href="../ladmin/css/xadmin.css" rel="stylesheet" type="text/css">
+    <link href="../ladmin/css/font.css" rel="stylesheet" type="text/css">
+    <link href="../ladmin/lib/layui/css/modules/layer/default/layer.css" rel="stylesheet" type="text/css">
+    <script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+    <script src="https://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <script charset="utf-8" src="../ladmin/lib/layui/layui.js"></script>
+    <script src="../ladmin/js/xadmin.js" type="text/javascript"></script>
+</head>
+<body class="layui-layout-body">
+<div class="layui-body"  >
+    <div id="wrapper" class="login-page" >
+
+
+        <div id="login_form" class="form" style="text-align: center">
+
+            <form class="login-form" style="text-align: center">
+
+                <div class="layui-col-xs8" style="display: inline">
+                    <input id="phoneNumber" maxlength="11" name="phoneNumber"
+                           onkeyup="value=value.replace(/[^1234567890-]+/g,'')" placeholder="手机号码"
+                           type="text"/>
+                </div>
+                <div class="layui-col-xs4" style="display: inline">
+                    <button id="getMessageCode">获取验证码</button>
+                </div>
+                <input id="code" maxlength="6" name="code" onkeyup="value=value.replace(/[^1234567890-]+/g,'')"
+                       placeholder="验证码"
+                       type="text"/>
+                <button id="login">登　录</button>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="layui-footer footer" style="text-align:center;">
+    <p>
+        <a class="layui-bg-gray" href="http://www.beian.miit.gov.cn">@CopyRight2020华南农业大学计算机维护队 粤ICP备20026612号</a>
+    </p>
+
+</div>
+
+<script type="text/javascript">
+
+    var but = document.getElementById("getMessageCode");
+
+    var sum;
+    var tmer;
+    let time = localStorage.getItem("time")
+    but.onclick = function () {
+        localStorage.clear()
+        if (time == null || time == undefined || time < 0) {
+            sum = 60
+        }
+        tm()
+    }
+
+    if (time == null || time == undefined) {
+        sum = 60
+    } else {
+        sum = time
+        tm()
+    }
+
+    function tm() {
+        but.disabled = true
+        tmer = setTimeout(tm, 1000)
+        sum--;
+        but.innerHTML = sum + "秒"
+        localStorage.setItem("time", sum)
+        if (sum < 1) {
+            localStorage.clear()
+            clearTimeout(tmer)
+            but.innerHTML = "取验证码"
+            flag = true;
+            but.disabled = false
+        }
+
+
+    }
+
+    function check_login() {
+
+        $.ajax({
+
+            type: 'POST',
+            url: 'login',
+            async: true,
+            data: JSON.stringify({
+                "phoneNumber": $("#phoneNumber").val(),
+                "code": $("#code").val()
+            }),
+            dataType: 'Text',
+            contentType: "application/Json;charset=UTF-8",
+            success: function (data) {
+                // data = "true";
+                if (data == "true") {
+                    layer.msg('登录成功');
+                    setTimeout(function () {
+                        localStorage.clear();
+                        document.location = "index";
+
+                    }, 2000);
+
+
+                } else {
+                    layer.msg('验证失败');
+                    $("#login_form").removeClass('shake_effect');
+                    setTimeout(function () {
+                        $("#login_form").addClass('shake_effect')
+                    }, 1);
+                }
+
+
+            }
+
+        });
+    }
+
+    function check_getMessage() {
+
+        $.ajax({
+            type: 'POST',
+            url: 'sendMessage',
+            async: true,
+            data: {
+                "phoneNumber": $("#phoneNumber").val()
+            },
+            dataType: 'Text',
+            contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+            beforeSend: function () {
+                layer.msg("发送成功");
+
+            },
+            success: function (data) {
+
+            }
+
+        });
+    }
+
+    $(function () {
+
+
+        $("#login").click(function () {
+            check_login();
+            return false;
+        }),
+            $("#getMessageCode").click(function () {
+                check_getMessage();
+                return false;
+            })
+
+
+    })
+
+</script>
+</body>
+</html>

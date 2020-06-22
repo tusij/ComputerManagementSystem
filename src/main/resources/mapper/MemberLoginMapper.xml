@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper:根标签，namespace：命名空间，随便写，一般保证命名空间唯一 -->
+<mapper namespace="com.computerManagementSystem.mapper.MemberLoginMapper">
+    <!-- statement，内容：sql语句。id：唯一标识，随便写，在同一个命名空间下保持唯一
+       resultType：sql语句查询结果集的封装类型,tb_user即为数据库中的表
+     -->
+
+    <select id="queryMemberLoginById" resultType="com.computerManagementSystem.pojo.MemberLogin">
+     select * from members where id = #{id};
+    </select>
+    <update id="updateMemberLogin" parameterType="com.computerManagementSystem.pojo.MemberLogin">
+        UPDATE members
+        <trim prefix="set" suffixOverrides=",">
+            <if test="role!=null">role = #{role},</if>
+            <if test="passwordMD5!=null">passwordMD5 = #{passwordMD5},</if>
+        </trim>
+        WHERE
+        (id = #{id});
+    </update>
+
+    <select id="queryRoleById" resultType="java.lang.String">
+        select role from members where id = #{id};
+    </select>
+    <select id="getCountByRole"  resultType="java.lang.Integer">
+        select count(*) from members where role = ${role};
+    </select>
+    <select id="queryMemberIsExit"  resultType="java.lang.Integer">
+        select count(*) from members where id = #{id};
+    </select>
+</mapper>

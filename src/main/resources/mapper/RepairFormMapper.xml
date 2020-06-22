@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.computerManagementSystem.mapper.RepairFormMapper">
+    <resultMap id="RepairingMap" type="RepairForm">
+        <id property="rid" column="rid"/>
+        <result property="nickname" column="nickname"/>
+        <result property="phoneNumber" column="phoneNumber"/>
+        <result property="sex" column="sex"/>
+        <result property="address" column="address"/>
+        <result property="repairMethod" column="repair_method"/>
+        <result property="description" column="description"/>
+        <result property="state" column="state"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="memberOne" column="member_one"/>
+        <result property="memberTwo" column="member_two"/>
+        <result property="memberThree" column="member_three"/>
+        <collection property="nameList" ofType="java.lang.String">
+            <id column="name" property="name"></id>
+        </collection>
+        <collection property="idList" ofType="java.lang.String">
+            <id column="id" property="id"></id>
+        </collection>
+    </resultMap>
+    <insert id="insertRepairForm" parameterType="com.computerManagementSystem.pojo.RepairForm">
+        INSERT INTO repairment(
+            rid,
+            nickname,
+            phoneNumber,
+            sex,
+            address,
+            repair_method,
+            description,
+            state,
+            start_date
+        )
+        VALUES (
+            #{rid},
+            #{nickname},
+            #{phoneNumber},
+            #{sex},
+            #{address},
+            #{repairMethod},
+            #{description},
+            #{state},
+            now()
+        );
+    </insert>
+    <update id="updateRepairForm" parameterType="com.computerManagementSystem.pojo.RepairForm">
+        UPDATE repairment
+        <trim prefix="set" suffixOverrides=",">
+            <if test="state!=null">state = #{state},</if>
+            <if test="endDate!=null">end_date = #{endDate},</if>
+
+        </trim>
+        WHERE
+        (rid = #{rid});
+    </update>
+    <select id="queryRepairFormByPhoneNumber" parameterType="java.util.Map"
+            resultType="com.computerManagementSystem.pojo.RepairForm">
+        select *from repairment where phoneNumber=#{phoneNumber} order by start_date desc limit #{start},#{limit}  ;
+    </select>
+    <select id="queryRepairFormByState" parameterType="java.lang.String"
+            resultType="com.computerManagementSystem.pojo.RepairForm" resultMap="RepairingMap">
+         select *from repairment left join repairs using (rid) left join personal_information using(id) where state = ${state} and ${repairMethod};
+
+    </select>
+    <insert id="setParticipant" parameterType="java.util.Map">
+        insert into repairs(rid,id)
+        values (#{rid},#{id});
+    </insert>
+    <select id="queryRepairNumsByPhoneNumber" resultType="java.lang.Integer">
+        select count(*) from repairment where phoneNumber = #{phoneNumber};
+    </select>
+
+    <select id="queryRepairFormByMemberID" parameterType="String"
+            resultType="com.computerManagementSystem.pojo.RepairForm">
+        select
+            rid,
+            nickname,
+            phoneNumber,
+            sex,
+            address,
+            repair_method as repairMethod,
+            description,
+            state,
+            start_date as startDate,
+            end_date as endDate
+
+        from repairment left join repairs using (rid) where id=#{id} ;
+    </select>
+
+</mapper>

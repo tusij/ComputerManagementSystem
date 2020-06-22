@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../layui/css/layui.css" rel="stylesheet">
+    <script src="../layui/layui.js" type="text/javascript"></script>
+    <script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+    <script src="https://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<table class="layui-hide" id="followTable" lay-filter="followTable" style="width: 100%"></table>
+<script type="text/javascript">
+    var dataList;
+    $.ajax({
+
+        type: 'POST',
+        url: 'getMembersTaskList',
+        async: false,
+        dataType: 'Json',
+        success: function (data) {
+            dataList = data;
+            console.log(data);
+        }
+
+    });
+
+    layui.use('table', function () {
+
+
+        var table = layui.table;
+        table.render({
+            elem: "#followTable",
+            skin: 'line',
+            toolbar: true,
+            cols: [
+                [
+                {field: "rid", title: "编号", align: 'center'},
+                {field: "phoneNumber", title: "手机号", align: 'center'},
+                {field: "nickname", title: "称呼", align: 'center'},
+                {field: "sex", title: "性别", align: 'left', width: 60},
+                {field: "address", title: "地址", align: 'left'},
+                {field: "repairMethod", title: "报修方式", align: 'center'},
+                {field: "description", title: "描述", align: 'left'},
+                {field: "startDate", title: "报修时间", align: 'center'},
+                {field: "endDate", title: "结束时间", align: 'center'},
+                {field: "state", title: "状态", align: 'left'},
+                {field: "nameList", title: "处理人", align: 'left'}
+
+            ]
+            ],
+            data: dataList.data,
+            page: true
+
+        });
+
+    })
+</script>
+</body>
+</html>

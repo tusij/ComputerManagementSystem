@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../layui/css/layui.css" rel="stylesheet">
+    <script src="../layui/layui.js" type="text/javascript"></script>
+    <script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+    <script src="https://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+    <link href="../ladmin/lib/layui/css/modules/layer/default/layer.css" rel="stylesheet" type="text/css">
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<table class="layui-hide" id="followTable" lay-filter="followTable" style="width: 100%"></table>
+<script id="barDemo" type="text/html">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="publish">修改参与人</button>
+        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="finish">完成</button>
+        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">取消</button>
+    </div>
+</script>
+<script type="text/javascript">
+    var dataList;
+
+
+    $.ajax({
+
+        type: 'POST',
+        url: 'getDoingTaskList',
+        async: false,
+        dataType: 'Json',
+        success: function (data) {
+            dataList = data;
+        }
+
+    });
+
+    layui.use('table', function () {
+
+
+        var table = layui.table;
+        table.render({
+            elem: "#followTable",
+            skin: 'line',
+            toolbar: true,
+            cols: [
+                [
+                {field: "rid", title: "编号", align: 'center'},
+                {field: "phoneNumber", title: "手机号", align: 'center'},
+                {field: "nickname", title: "称呼", align: 'center'},
+                {field: "address", title: "地址", align: 'left'},
+                {field: "idList", title: "参与人", align: 'left', edit: "text"},
+                {field: "nameList", title: "参与人", align: 'left'},
+                {field: "tool", title: "操作", align: 'center', toolbar: '#barDemo'}
+            ]
+            ],
+            data: dataList.data,
+            page: true
+
+        });
+        table.on('tool(followTable)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'delete') {
+                $.ajax({
+
+                    type: 'POST',
+                    url: 'cancelTask',
+                    async: false,
+                    traditional: true,
+                    data: {'rid': data.rid},
+                    dataType: 'Text',
+                    contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+                    success: function (data2) {
+                        layer.msg(data.rid + data.nickname + '任务取消');
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+
+                    }
+
+                });
+
+            }
+            if (obj.event == 'publish') {
+                $.ajax({
+
+                    type: 'POST',
+                    url: 'releaseTask',
+                    async: false,
+                    traditional: true,
+                    data:{
+                        'rid': data.rid,
+                        'idList':data.idList
+                    },
+                    dataType: 'Text',
+                    contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+                    success: function (data2) {
+                        layer.msg(data.rid + data.nickname + '任务发布');
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+
+                    }
+
+                });
+
+            }
+            if (obj.event == 'finish') {
+
+                $.ajax({
+
+                    type: 'POST',
+                    url: 'finishTask',
+                    async: false,
+                    traditional: true,
+                    data: {'rid': data.rid},
+                    dataType: 'Text',
+                    contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+                    success: function (data2) {
+                        layer.msg(data.rid + data.nickname + '完成');
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+
+                    }
+
+                });
+
+            }
+
+
+        });
+
+    })
+</script>
+</body>
+</html>

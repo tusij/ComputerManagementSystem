@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.computerManagementSystem.mapper.MemberInfoMapper">
+    <insert id="insertMember" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.computerManagementSystem.pojo.Member">
+        INSERT INTO personal_information(
+        id,
+        name,
+        major,
+        phone,
+        address,
+        birthday,
+        WeChat,
+        QQ,
+        email
+        )
+        VALUES
+        (
+        #{id},
+        #{name},
+        #{major},
+        #{phone},
+        #{address},
+        #{birthday},
+        #{WeChat},
+        #{QQ},
+        #{email}
+        );
+    </insert>
+
+    <update id="update" parameterType="com.computerManagementSystem.pojo.Member">
+        UPDATE personal_information set
+            major = #{major},
+            phone = #{phone},
+            address = #{address},
+            birthday = #{birthday},
+            WeChat = #{WeChat},
+            QQ = #{QQ},
+            email = #{email}
+        where
+        (id = #{id});
+    </update>
+
+    <select id="queryAllMember" parameterType="java.util.Map" resultType="com.computerManagementSystem.pojo.Member">
+        SELECT * from personal_information  limit #{start},#{pageSize} ;
+    </select>
+
+    <select id="queryMemberByID" parameterType="String" resultType="com.computerManagementSystem.pojo.Member">
+        SELECT * from personal_information where id = #{id};
+    </select>
+    <select id="queryNameByID" parameterType="String" resultType="String">
+        select name from personal_information where id = #{id};
+    </select>
+    <select id="queryMemberByRole" parameterType="java.util.Map"
+            resultType="com.computerManagementSystem.pojo.Member">
+        SELECT * from personal_information left join members using(id) where role = ${role} limit #{start},#{limit};
+    </select>
+
+    <select id="queryByName" parameterType="java.util.Map"
+            resultType="com.computerManagementSystem.pojo.Member">
+        SELECT id,name from personal_information where name like "%"#{name}"%"  ;
+    </select>
+
+</mapper>
